@@ -18,3 +18,34 @@
 * Description
 This application does all the authentication and registration of the users for lchat and provides also the possibility to log in
 using the facebook and the google+ platform.
+* Design
+** Requirements
+- [ ] Authenticate log in credentials
+- [ ] Sign up a new user
+- [ ] Facebook and Google+ integration
+** Deployment diagram
+#+BEGIN_SRC plantuml :file CompDiagram.png
+@startuml
+package "mobile" {
+    [lchat client]
+}
+package "server" {
+    [lchatServer]
+}
+database "MySQL"{
+    [Database]
+}
+
+[lchatServer] --> [Database]:SQL
+[Database] --> [lchatServer]:Data
+[lchat client] --> [lchatServer]:JSON (Login/Signup)
+[lchatServer] --> [lchat client]:Confirmation
+@enduml
+#+END_SRC
+
+#+RESULTS:
+[[http://postimg.org/image/sibe41v5t/]]
+** Class diagram
+* Setup
+* Implementation
+* Test
