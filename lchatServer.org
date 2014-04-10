@@ -44,7 +44,7 @@ database "MySQL"{
 #+END_SRC
 
 #+RESULTS:
-[[http://postimg.org/image/sibe41v5t/]]
+[[http://s16.postimg.org/t7u6gevph/Comp_Diagram.png]]
 ** Class diagram
 * Setup
 * Implementation
