@@ -74,3 +74,7 @@ create table users (
 
 * Implementation
 * Test
+* Documentation
+- http://pymotw.com/2/json/
+- https://developers.facebook.com/docs/android/getting-started/
+- http://stackoverflow.com/questions/2572099/pythons-safest-method-to-store-and-retrieve-passwords-from-a-database
