@@ -1,0 +1,20 @@
+#+TITLE:     lchatServer
+#+AUTHOR:    Eric Nova Ibáñez
+#+EMAIL:     ericnova3@gmail.com
+#+DATE:      2014-04-10 jue
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+#+XSLT:
+
+
+* Description
+This application does all the authentication and registration of the users for lchat and provides also the possibility to log in
+using the facebook or the google+ platform.
