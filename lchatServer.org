@@ -47,5 +47,30 @@ database "MySQL"{
 [[http://s16.postimg.org/t7u6gevph/Comp_Diagram.png]]
 ** Class diagram
 * Setup
+** Database
+*** Connect to the DDBB
+#+BEGIN_SRC sh :result silent
+  mysql -h 192.168.1.4 --defaults-file=~/.my.cnf 
+#+END_SRC
+
+#+BEGIN_SRC sh :result silent :noweb yes
+  mysql --defaults-file=~/.my.cnf -h 192.168.1.4 -e"<<EXE>>"
+#+END_SRC
+
+#+RESULTS:
+
+*** Create users table
+#+BEGIN_SRC sql :noweb-ref EXE
+use lchat;
+
+create table users (
+    Nick char(30) not null primary key,
+    Password char(125) not null,
+    Email char(125) not null,
+    Description char(255),
+    Photo char(255)
+);
+#+END_SRC
+
 * Implementation
 * Test
