@@ -3,12 +3,14 @@
 import SocketServer
 import json
 import logging
+import os
 
 
 logger = logging.getLogger("jsonSocket")
 logger.setLevel(logging.DEBUG)
 FORMAT = '[%(asctime)-15s][%(levelname)s][%(funcName)s] %(message)s'
 logging.basicConfig(format=FORMAT)
+# logging.basicConfig(format=FORMAT,filename='log/server.log',filemode='w')
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     """
@@ -21,14 +23,18 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
-        nick = json.loads(self.data)[0]['nick']
-        print "{} wrote:".format(self.client_address[0])
-        print nick
+        if json.loads(self.data)[0]['login']:
+           logger.debug("\tUser trying to log in") 
+           nick = json.loads(self.data)[0]['nick']
+           password = json.loads(self.data)[0]['password']
+           logger.info("\tUser: %s, Password: %s ",nick,password) 
         # just send back the same data, but upper-cased
         self.request.sendall(self.data.upper())
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 9999
+    os.system('clear')
+    logger.info("\tStarting Server application")
+    HOST, PORT = "localhost", 9995
 
     # Create the server, binding to localhost on port 9999
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
