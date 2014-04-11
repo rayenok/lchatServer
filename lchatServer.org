@@ -60,7 +60,7 @@ database "MySQL"{
 #+RESULTS:
 
 *** Create users table
-#+BEGIN_SRC sql :noweb-ref EXE
+#+BEGIN_SRC sql :noweb-ref CreateTable
 use lchat;
 
 create table users (
@@ -73,6 +73,19 @@ create table users (
 #+END_SRC
 
 * Implementation
+** Trying libraries
+*** JSON
+#+BEGIN_SRC python :result both
+  import json
+  
+  test = [{'a':1,'b':'hi'}]
+  c = json.dumps(test)
+  return str(json.loads(c)[0]['a'])
+#+END_SRC
+
+#+RESULTS:
+: 1
+
 * Test
 * Documentation
 - http://pymotw.com/2/json/
