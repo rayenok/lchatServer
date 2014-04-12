@@ -16,7 +16,7 @@
 
 
 * Description
-This application does all the authentication and registration of the users for lchat and provides also the possibility to log in
+This application does all the authentication and registration of the users for the lchat application (android) and provides also the possibility to log in
 using the facebook and the google+ platform.
 * Documentation
-You can see a detailed explanation in the [[file:lchatServer.org][lchatServer.org]]
+You can see a detailed explanation in this file: [[https://github.com/rayenok/lchatServer/blob/master/lchatServer.org][lchatServer.org]] 

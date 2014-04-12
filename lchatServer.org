@@ -16,12 +16,12 @@
 
 
 * Description
-This application does all the authentication and registration of the users for lchat and provides also the possibility to log in
+This application does all the authentication and registration of the users for the lchat application (android) and provides also the possibility to log in
 using the facebook and the google+ platform.
 * Design
 ** Requirements
-- [ ] Authenticate log in credentials
-- [ ] Sign up a new user
+- [X] Authenticate login credentials
+- [X] Sign up a new user
 - [ ] Facebook and Google+ integration
 ** Deployment diagram
 #+BEGIN_SRC plantuml :file CompDiagram.png
@@ -97,12 +97,14 @@ return cur.fetchall()
 #+END_SRC
 
 #+RESULTS:
-| test    | bla | bla@bla.com | None | None           |
-| bla     | bli | blo@blo.com | None | None           |
-| test123 | bla | bla@bla.com | idk  | /go/to/foo.png |
+| test32 | 2b176eaf51e9ccdc0190048e64d607a6fae17e6c$0a8a77857ef446ea9cede48e38c5a24e | bla@bla.com | idk | /go/to/foo.png |
 
 * Test
 * Documentation
 - http://pymotw.com/2/json/
 - https://developers.facebook.com/docs/android/getting-started/
 - http://stackoverflow.com/questions/2572099/pythons-safest-method-to-store-and-retrieve-passwords-from-a-database
+- https://docs.python.org/2/library/socket.html
+- https://docs.python.org/2/library/thread.html
+- http://seanmcgary.com/posts/threaded-tcp-server-in-python
+- http://ianhowson.com/a-quick-guide-to-using-mysql-in-python.html
