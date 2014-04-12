@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 import thread
+import hashlib
 import socket
 import json
 import logging
 import os
 import MySQLdb
 import coloredlogs
+import uuid
 
 logger = logging.getLogger("jsonSocket")
 coloredlogs.install(level=logging.DEBUG)
@@ -14,6 +16,18 @@ logger.setLevel(logging.DEBUG)
 FORMAT = '[%(asctime)-15s][%(levelname)s][%(funcName)s] %(message)s'
 logging.basicConfig(format=FORMAT)
 # logging.basicConfig(format=FORMAT,filename='log/server.log',filemode='w')
+
+
+def encryptPassword(raw_password):
+    import random
+    algo = 'sha1'
+    salt = uuid.uuid4().hex
+    return hashlib.sha1(raw_password + salt).hexdigest()+"$"+str(salt)
+
+def checkPassword(password, password_db):
+    encrypted_password = password_db.split("$")[0]
+    salt = password_db.split("$")[1]
+    return True if hashlib.sha1(password + salt).hexdigest() == encrypted_password else False
 
 def handler(clientsocket):
     data = clientsocket.recv(1024).strip()
@@ -29,13 +43,13 @@ def handler(clientsocket):
             logger.info("\tUser logged in")
             clientsocket.sendall("OK")
         else:
-            logger.info("\tUser and/or password invalid")
+            logger.error("\tUser and/or password invalid")
             clientsocket.sendall("ERROR: 1")
     else:
         logger.debug("\tUser trying sign in") 
         SignDict = {}
         SignDict['nick'] = json.loads(data)[0]['nick']
-        SignDict['password'] = json.loads(data)[0]['password']
+        SignDict['password'] = encryptPassword(json.loads(data)[0]['password'])
         SignDict['email'] = json.loads(data)[0]['email']
         SignDict['description'] = json.loads(data)[0]['description']
         SignDict['photo'] = json.loads(data)[0]['photo']
@@ -64,8 +78,11 @@ class Database(object):
 
     def login(self,data):
         try:
-            nRows = self.cur.execute("""SELECT nick,password FROM users WHERE nick=%s AND password=%s LIMIT 1;""",(data['nick'],data['password']))
-            return True if nRows == 1 else False
+            nRows = self.cur.execute("""SELECT nick,password FROM users WHERE nick=%s LIMIT 1;""",(data['nick']))
+            if nRows == 1:
+                return checkPassword(data['password'], self.cur.fetchone()[1])
+            else:
+                return False
         except MySQLdb as e:
             raise e
 
@@ -85,7 +102,7 @@ class Database(object):
 if __name__ == "__main__":
     os.system('clear')
     logger.info("\tStarting Server application")
-    host, port= "localhost", 9977
+    host, port= "localhost", 9973
 
     addr = (host, port)
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,7 +111,7 @@ if __name__ == "__main__":
     serversocket.listen(5)
 
     while True:
-        logger.info("\tServer is listening for connections")
+        logger.debug("\tServer is listening for connections")
         clientsocket, clientaddr = serversocket.accept()
         thread.start_new_thread(handler,(clientsocket,))
 

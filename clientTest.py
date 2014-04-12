@@ -13,8 +13,8 @@ HOST, PORT = "localhost", 9994
 if len(sys.argv)==2:
     PORT = int(sys.argv[1])
 # data = " ".join(sys.argv[1:])
-dataTestLogin = [{'login':True,'nick':'test','password':'bla'}]
-dataTestSignup= [{'login':False,'nick':'test123','password':'bla','email':'bla@bla.com','description':'idk','photo':'/go/to/foo.png'}]
+dataTestLogin = [{'login':True,'nick':'test32','password':'bli'}]
+dataTestSignup= [{'login':False,'nick':'test32','password':'bla','email':'bla@bla.com','description':'idk','photo':'/go/to/foo.png'}]
 
 # Create a socket (SOCK_STREAM means a TCP socket)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,7 +22,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     # Connect to server and send data
     sock.connect((HOST, PORT))
-    sock.sendall(json.dumps(dataTestSignup))
+    sock.sendall(json.dumps(dataTestLogin))
+    # sock.sendall(json.dumps(dataTestSignup))
 
     # Receive data from the server and shut down
     received = sock.recv(1024)
