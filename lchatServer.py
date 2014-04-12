@@ -4,9 +4,12 @@ import SocketServer
 import json
 import logging
 import os
+import MySQLdb
+import coloredlogs
 
 
 logger = logging.getLogger("jsonSocket")
+coloredlogs.install(level=logging.DEBUG)
 logger.setLevel(logging.DEBUG)
 FORMAT = '[%(asctime)-15s][%(levelname)s][%(funcName)s] %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -23,18 +26,72 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
+        db = Database()
         if json.loads(self.data)[0]['login']:
            logger.debug("\tUser trying to log in") 
-           nick = json.loads(self.data)[0]['nick']
-           password = json.loads(self.data)[0]['password']
-           logger.info("\tUser: %s, Password: %s ",nick,password) 
+           authDict = {}
+           authDict['nick'] = json.loads(self.data)[0]['nick']
+           authDict['password'] = json.loads(self.data)[0]['password']
+           logger.info("\tUser: %s, Password: %s ",authDict['nick'],authDict['password']) 
+           bAuth = db.login(authDict)
+           if bAuth:
+               logger.info("\tUser logged in")
+           else:
+               logger.info("\tUser and/or password invalid")
+        else:
+           logger.debug("\tUser trying sign in") 
+           SignDict = {}
+           SignDict['nick'] = json.loads(self.data)[0]['nick']
+           SignDict['password'] = json.loads(self.data)[0]['password']
+           SignDict['email'] = json.loads(self.data)[0]['email']
+           SignDict['description'] = json.loads(self.data)[0]['description']
+           SignDict['photo'] = json.loads(self.data)[0]['photo']
+           bSign = db.signUp(SignDict)
+           if bSign:
+               logger.info("\tUser signed in")
+           else:
+               logger.error("\tThere was some problem signing in")
+
         # just send back the same data, but upper-cased
         self.request.sendall(self.data.upper())
+
+class Database(object):
+    """docstring for MySQLHandler"""
+    db = None
+    cur = None
+    def __init__(self):
+        super(Database, self).__init__()
+        try:
+            logger.info("\tConnecting to the database")
+            self.db = MySQLdb.connect(read_default_file="~/.my.cnf",host="192.168.1.4",port=3306,db="lchat")
+            self.cur = self.db.cursor()
+        except MySQLdb.Error as  e:
+            raise e
+
+    def login(self,data):
+        try:
+            nRows = self.cur.execute("""SELECT nick,password FROM users WHERE nick=%s AND password=%s LIMIT 1;""",(data['nick'],data['password']))
+            return True if nRows == 1 else False
+        except MySQLdb as e:
+            raise e
+
+    def signUp(self,data):
+        try:
+            nRows = self.cur.execute("""INSERT INTO users SET nick=%s, password=%s, email=%s, description=%s, photo=%s;""",(data['nick'],data['password'],data['email'],data['description'],data['photo']))
+            return True if nRows == 1 else False
+        except MySQLdb.IntegrityError:
+            logger.error("\tThe user already exist")
+            #TODO: Here i need to notify to the user that the nick already exist
+        except MySQLdb as e:
+            raise e
+
+    def close(self):
+        self.cur.close()
 
 if __name__ == "__main__":
     os.system('clear')
     logger.info("\tStarting Server application")
-    HOST, PORT = "localhost", 9995
+    HOST, PORT = "localhost", 9990
 
     # Create the server, binding to localhost on port 9999
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
