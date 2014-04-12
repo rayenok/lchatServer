@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-import SocketServer
+import thread
+import socket
 import json
 import logging
 import os
 import MySQLdb
 import coloredlogs
-
 
 logger = logging.getLogger("jsonSocket")
 coloredlogs.install(level=logging.DEBUG)
@@ -15,45 +15,39 @@ FORMAT = '[%(asctime)-15s][%(levelname)s][%(funcName)s] %(message)s'
 logging.basicConfig(format=FORMAT)
 # logging.basicConfig(format=FORMAT,filename='log/server.log',filemode='w')
 
-class MyTCPHandler(SocketServer.BaseRequestHandler):
-    """
-    The RequestHandler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        db = Database()
-        if json.loads(self.data)[0]['login']:
-           logger.debug("\tUser trying to log in") 
-           authDict = {}
-           authDict['nick'] = json.loads(self.data)[0]['nick']
-           authDict['password'] = json.loads(self.data)[0]['password']
-           logger.info("\tUser: %s, Password: %s ",authDict['nick'],authDict['password']) 
-           bAuth = db.login(authDict)
-           if bAuth:
-               logger.info("\tUser logged in")
-           else:
-               logger.info("\tUser and/or password invalid")
+def handler(clientsocket):
+    data = clientsocket.recv(1024).strip()
+    db = Database()
+    if json.loads(data)[0]['login']:
+        logger.debug("\tUser trying to log in") 
+        authDict = {}
+        authDict['nick'] = json.loads(data)[0]['nick']
+        authDict['password'] = json.loads(data)[0]['password']
+        logger.info("\tUser: %s, Password: %s ",authDict['nick'],authDict['password']) 
+        bAuth = db.login(authDict)
+        if bAuth:
+            logger.info("\tUser logged in")
+            clientsocket.sendall("OK")
         else:
-           logger.debug("\tUser trying sign in") 
-           SignDict = {}
-           SignDict['nick'] = json.loads(self.data)[0]['nick']
-           SignDict['password'] = json.loads(self.data)[0]['password']
-           SignDict['email'] = json.loads(self.data)[0]['email']
-           SignDict['description'] = json.loads(self.data)[0]['description']
-           SignDict['photo'] = json.loads(self.data)[0]['photo']
-           bSign = db.signUp(SignDict)
-           if bSign:
-               logger.info("\tUser signed in")
-           else:
-               logger.error("\tThere was some problem signing in")
+            logger.info("\tUser and/or password invalid")
+            clientsocket.sendall("ERROR: 1")
+    else:
+        logger.debug("\tUser trying sign in") 
+        SignDict = {}
+        SignDict['nick'] = json.loads(data)[0]['nick']
+        SignDict['password'] = json.loads(data)[0]['password']
+        SignDict['email'] = json.loads(data)[0]['email']
+        SignDict['description'] = json.loads(data)[0]['description']
+        SignDict['photo'] = json.loads(data)[0]['photo']
+        bSign = db.signUp(SignDict)
+        if bSign:
+            logger.info("\tUser signed in")
+            clientsocket.sendall("OK")
+        else:
+            logger.error("\tThere was some problem signing in")
+            clientsocket.sendall("ERROR: 2")
+    db.close()
 
-        # just send back the same data, but upper-cased
-        self.request.sendall(self.data.upper())
 
 class Database(object):
     """docstring for MySQLHandler"""
@@ -91,11 +85,19 @@ class Database(object):
 if __name__ == "__main__":
     os.system('clear')
     logger.info("\tStarting Server application")
-    HOST, PORT = "localhost", 9990
+    host, port= "localhost", 9977
 
+    addr = (host, port)
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Create the server, binding to localhost on port 9999
-    server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+    serversocket.bind(addr)
+    serversocket.listen(5)
 
-    # Activate the server; this will keep running until you
-    # interrupt the program with Ctrl-C
-    server.serve_forever()
+    while True:
+        logger.info("\tServer is listening for connections")
+        clientsocket, clientaddr = serversocket.accept()
+        thread.start_new_thread(handler,(clientsocket,))
+
+    serversocket.close()
+
+
