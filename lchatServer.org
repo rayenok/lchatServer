@@ -85,6 +85,21 @@ create table users (
 
 #+RESULTS:
 : 1
+*** MySQLdb
+#+BEGIN_SRC python :result both
+import MySQLdb
+
+db = MySQLdb.connect(read_default_file="~/.my.cnf",host="192.168.1.4",port=3306,db="lchat")
+cur = db.cursor()
+
+cur.execute("""SELECT * FROM users;""")
+return cur.fetchall()
+#+END_SRC
+
+#+RESULTS:
+| test    | bla | bla@bla.com | None | None           |
+| bla     | bli | blo@blo.com | None | None           |
+| test123 | bla | bla@bla.com | idk  | /go/to/foo.png |
 
 * Test
 * Documentation
