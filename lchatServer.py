@@ -20,14 +20,14 @@ logging.basicConfig(format=FORMAT)
 
 def encryptPassword(raw_password):
     import random
-    algo = 'sha1'
+    algo = 'sha256'
     salt = uuid.uuid4().hex
-    return hashlib.sha1(raw_password + salt).hexdigest()+"$"+str(salt)
+    return hashlib.sha256(raw_password + salt).hexdigest()+"$"+str(salt)
 
 def checkPassword(password, password_db):
     encrypted_password = password_db.split("$")[0]
     salt = password_db.split("$")[1]
-    return True if hashlib.sha1(password + salt).hexdigest() == encrypted_password else False
+    return True if hashlib.sha256(password + salt).hexdigest() == encrypted_password else False
 
 def handler(clientsocket):
     data = clientsocket.recv(1024).strip()
@@ -67,11 +67,12 @@ class Database(object):
     """docstring for MySQLHandler"""
     db = None
     cur = None
+
     def __init__(self):
         super(Database, self).__init__()
         try:
             logger.info("\tConnecting to the database")
-            self.db = MySQLdb.connect(read_default_file="~/.my.cnf",host="192.168.1.4",port=3306,db="lchat")
+            self.db = MySQLdb.connect(read_default_file="~/.my.cnf", host="192.168.1.4",port=3306,db="lchat")
             self.cur = self.db.cursor()
         except MySQLdb.Error as  e:
             raise e

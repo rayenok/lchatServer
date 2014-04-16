@@ -13,7 +13,7 @@ HOST, PORT = "localhost", 9994
 if len(sys.argv)==2:
     PORT = int(sys.argv[1])
 # data = " ".join(sys.argv[1:])
-dataTestLogin = [{'login':True,'nick':'test32','password':'bli'}]
+dataTestLogin = [{'login':True,'nick':'test32','password':'bla'}]
 dataTestSignup= [{'login':False,'nick':'test32','password':'bla','email':'bla@bla.com','description':'idk','photo':'/go/to/foo.png'}]
 
 # Create a socket (SOCK_STREAM means a TCP socket)
