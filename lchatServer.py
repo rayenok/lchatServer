@@ -31,6 +31,7 @@ def checkPassword(password, password_db):
 
 def handler(clientsocket):
     data = clientsocket.recv(1024).strip()
+    logger.debug("\tUser connected to the server")
     db = Database()
     if json.loads(data)[0]['login']:
         logger.debug("\tUser trying to log in") 
@@ -103,7 +104,7 @@ class Database(object):
 if __name__ == "__main__":
     os.system('clear')
     logger.info("\tStarting Server application")
-    host, port= "localhost", 9973
+    host, port= "0.0.0.0", 9973
 
     addr = (host, port)
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
