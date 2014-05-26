@@ -33,31 +33,42 @@ def handler(clientsocket):
     data = clientsocket.recv(1024).strip()
     logger.debug("\tUser connected to the server")
     db = Database()
-    if json.loads(data)[0]['login']:
+
+    logger.info("\tJSON: "+data)
+    logger.info("\tLogin? ")
+    logger.info("\tNick: "+str(json.loads(data)['nick']))
+    if json.loads(data)['login']:
         logger.debug("\tUser trying to log in") 
         authDict = {}
-        authDict['nick'] = json.loads(data)[0]['nick']
-        authDict['password'] = json.loads(data)[0]['password']
+        authDict['nick'] = json.loads(data)['nick']
+        authDict['password'] = json.loads(data)['password']
         logger.info("\tUser: %s, Password: %s ",authDict['nick'],authDict['password']) 
         bAuth = db.login(authDict)
+
         if bAuth:
             logger.info("\tUser logged in")
             clientsocket.sendall("OK")
+
         else:
             logger.error("\tUser and/or password invalid")
             clientsocket.sendall("ERROR: 1")
+
     else:
         logger.debug("\tUser trying sign in") 
         SignDict = {}
-        SignDict['nick'] = json.loads(data)[0]['nick']
-        SignDict['password'] = encryptPassword(json.loads(data)[0]['password'])
-        SignDict['email'] = json.loads(data)[0]['email']
-        SignDict['description'] = json.loads(data)[0]['description']
-        SignDict['photo'] = json.loads(data)[0]['photo']
+        SignDict['nick'] = json.loads(data)['nick']
+        SignDict['password'] = encryptPassword(json.loads(data)['password'])
+        SignDict['email'] = json.loads(data)['email']
+        SignDict['description'] = json.loads(data)['description']
+        SignDict['photo'] = json.loads(data)['photo']
+
         bSign = db.signUp(SignDict)
         if bSign:
             logger.info("\tUser signed in")
-            clientsocket.sendall("OK")
+            if os.system('ejabberdctl register'+SignDict['nick']+' localhost '+SignDict['password']) == 0:
+                clientsocket.sendall("OK")
+            else:
+                clientsocket.sendall("ERROR: 2")
         else:
             logger.error("\tThere was some problem signing in")
             clientsocket.sendall("ERROR: 2")
